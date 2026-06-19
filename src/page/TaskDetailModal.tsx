@@ -42,7 +42,14 @@ export default function TaskDetailModal({
   onTaskUpdated, 
   showToast 
 }: TaskDetailModalProps) {
-  const [editDescription, setEditDescription] = useState(task.description || '');
+  const getInitialDescription = (currentTask: Task) => {
+    const savedDescription = currentTask.description?.trim();
+    return savedDescription && savedDescription.length > 0
+      ? currentTask.description || ''
+      : `${currentTask.title} `;
+  };
+
+  const [editDescription, setEditDescription] = useState(getInitialDescription(task));
   const [editRemarks, setEditRemarks] = useState(task.remarks || '');
   const [editNextFollowup, setEditNextFollowup] = useState(task.nextFollowup || '');
   const [isSavingDetails, setIsSavingDetails] = useState(false);
@@ -52,7 +59,7 @@ export default function TaskDetailModal({
 
   // Sync state if task changes
   useEffect(() => {
-    setEditDescription(task.description || '');
+    setEditDescription(getInitialDescription(task));
     setEditRemarks(task.remarks || '');
     setEditNextFollowup(task.nextFollowup || '');
   }, [task]);
@@ -165,12 +172,12 @@ export default function TaskDetailModal({
         <form onSubmit={handleSaveTaskDetails} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" style={{ fontSize: '0.75rem' }}>Work Overview / Description</label>
-            <input 
-              type="text" 
+            <textarea 
               className="form-input" 
               placeholder="e.g. Toys assorted work, Kolkata Stock, etc."
               value={editDescription}
               onChange={e => setEditDescription(e.target.value)}
+              style={{ minHeight: '84px', resize: 'vertical' }}
             />
           </div>
 
@@ -186,11 +193,10 @@ export default function TaskDetailModal({
           </div>
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.75rem' }}>Next Followup Date / Status</label>
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Next Followup Date</label>
             <input 
-              type="text" 
+              type="date" 
               className="form-input" 
-              placeholder="e.g. Tmrw, 15/06/2026, Salem approval pending, or -"
               value={editNextFollowup}
               onChange={e => setEditNextFollowup(e.target.value)}
             />

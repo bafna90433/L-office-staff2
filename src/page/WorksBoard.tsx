@@ -51,6 +51,28 @@ export default function WorksBoard({ tasks, onOpenTaskDetails }: WorksBoardProps
     return true;
   });
 
+  const getTodayString = () => {
+    const d = new Date();
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - tzOffset).toISOString().split('T')[0];
+  };
+  const todayStr = getTodayString();
+
+  // Sort: Today's followups first, then newest first
+  const sortedFiltered = [...filteredTasks].sort((a, b) => {
+    const aToday = a.nextFollowup === todayStr && a.status !== 'completed';
+    const bToday = b.nextFollowup === todayStr && b.status !== 'completed';
+    if (aToday && !bToday) return -1;
+    if (!aToday && bToday) return 1;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  // A task is "NEW" if created within the last 24 hours and still pending
+  const isNewTask = (task: Task) =>
+    task.status === 'pending' &&
+    Date.now() - new Date(task.createdAt).getTime() < 24 * 60 * 60 * 1000;
+
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div className="works-header">
@@ -107,16 +129,41 @@ export default function WorksBoard({ tasks, onOpenTaskDetails }: WorksBoardProps
 
       {/* Tasks list grid */}
       <div className="task-list">
-        {filteredTasks.map(task => {
+        {sortedFiltered.map(task => {
           const isCompleted = task.status === 'completed';
+          const isNew = isNewTask(task);
+          const isTodayFollowup = task.nextFollowup === todayStr && !isCompleted;
+          
+          let cardBorder = {};
+          if (isTodayFollowup) {
+            cardBorder = { border: '2px solid var(--color-danger)', boxShadow: '0 0 0 3px rgba(239,68,68,0.15)' };
+          } else if (isNew) {
+            cardBorder = { border: '2px solid #6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.15), 0 4px 16px rgba(99,102,241,0.12)' };
+          }
+
           return (
-            <div 
-              key={task._id} 
+            <div
+              key={task._id}
               className={`glass-panel task-card ${isCompleted ? 'task-card-completed' : ''}`}
+              style={cardBorder}
               onClick={() => onOpenTaskDetails(task)}
             >
               <div className="flex-between">
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {isNew && (
+                    <span style={{
+                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                      color: '#fff',
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '20px',
+                      letterSpacing: '0.5px',
+                      animation: 'newBadgePulseWB 1.5s infinite',
+                    }}>
+                      ✨ NEW
+                    </span>
+                  )}
                   <span className={`badge ${
                     task.taskType === 'reminder-sir' ? 'badge-warning' :
                     task.taskType === 'custom' ? 'badge-info' : 'badge-success'
@@ -151,8 +198,21 @@ export default function WorksBoard({ tasks, onOpenTaskDetails }: WorksBoardProps
                 </div>
                 <div className="task-next-followup">
                   <span style={{ color: 'var(--text-secondary)' }}>Next Followup:</span>{' '}
-                  <span style={{ fontWeight: 600, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Calendar size={14} /> {task.nextFollowup || 'Not set'}
+                  <span style={{ 
+                    fontWeight: 600, 
+                    color: isTodayFollowup ? 'var(--color-danger)' : 'var(--accent-primary)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '4px' 
+                  }}>
+                    <Calendar size={14} /> 
+                    {task.nextFollowup ? (
+                      isTodayFollowup ? '🔥 TODAY' : (
+                        !isNaN(new Date(task.nextFollowup).getTime())
+                          ? new Date(task.nextFollowup).toLocaleDateString('en-GB')
+                          : task.nextFollowup
+                      )
+                    ) : 'Not set'}
                   </span>
                 </div>
               </div>

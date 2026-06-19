@@ -234,6 +234,10 @@ export default function App() {
           <Notices 
             reminders={reminders}
             onAcknowledgeReminder={handleAcknowledgeReminder}
+            apiBase={API_BASE}
+            token={token!}
+            showToast={showToast}
+            onRefresh={fetchReminders}
           />
         );
       case 'chat':
@@ -303,7 +307,7 @@ export default function App() {
             className={`nav-link btn-secondary ${activeTab === 'reminders' ? 'active' : ''}`}
             style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}
           >
-            <Bell size={18} /> Owner Notices
+            <Bell size={18} /> MD Notices
             {pendingNoticesCount > 0 && (
               <span className="badge badge-warning" style={{ marginLeft: 'auto', padding: '2px 8px' }}>
                 {pendingNoticesCount}
@@ -322,17 +326,24 @@ export default function App() {
               </span>
             )}
           </button>
-          <button 
-            onClick={() => setActiveTab('profile')} 
-            className={`nav-link btn-secondary ${activeTab === 'profile' ? 'active' : ''}`}
-            style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}
-          >
-            <UserIcon size={18} /> My Profile
-          </button>
         </nav>
 
         <div style={{ marginTop: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <div 
+            onClick={() => setActiveTab('profile')}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              marginBottom: '16px',
+              cursor: 'pointer',
+              padding: '8px',
+              borderRadius: '8px',
+              transition: 'var(--transition-smooth)',
+              border: activeTab === 'profile' ? '1px solid var(--accent-primary)' : '1px solid transparent',
+              background: activeTab === 'profile' ? 'rgba(99, 102, 241, 0.05)' : 'transparent'
+            }}
+          >
             {user?.imageUrl ? (
               <img 
                 src={user.imageUrl} 
