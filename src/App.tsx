@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, LogOut, FileText, Bell, MessageSquare, User as UserIcon } from 'lucide-react';
+import { TrendingUp, LogOut, FileText, Bell, MessageSquare } from 'lucide-react';
 
 // Import Pages
 import Login from './page/Login';
