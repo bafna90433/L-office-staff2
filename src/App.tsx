@@ -11,9 +11,7 @@ import TaskDetailModal from './page/TaskDetailModal';
 import CreateTaskModal from './page/CreateTaskModal';
 import Profile from './page/Profile';
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:5000/api'
-  : 'https://l-backend-production-ff32.up.railway.app/api';
+const API_BASE = 'https://l-backend-production-ff32.up.railway.app/api';
 
 interface User {
   id: string;
