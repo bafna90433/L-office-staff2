@@ -1,8 +1,5 @@
 import { 
-  CheckCircle, 
-  AlertCircle, 
   Bell, 
-  FileText, 
   ChevronRight
 } from 'lucide-react';
 import '../styles/Dashboard.css';
@@ -62,11 +59,6 @@ export default function Dashboard({
           100% { opacity: 1; }
         }
       `}</style>
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Staff 2 Dashboard</h1>
-        <p className="dashboard-subtitle">Track daily works, follow-ups, and reminders assigned by MD/Owner.</p>
-      </div>
-
       {/* Glowing Notice Banner */}
       {reminders.filter(r => r.status === 'pending').map(rem => {
         const timeDiff = new Date(rem.targetDate).getTime() - Date.now();
@@ -99,40 +91,128 @@ export default function Dashboard({
 
       {/* Stat Cards */}
       <div className="stats-grid">
-        <div className="glass-panel stat-card">
-          <div className="stat-header">
-            <span>Total Assigned Works</span>
-            <FileText size={20} style={{ color: 'var(--accent-primary)' }} />
+        {/* Card 1: Total Assigned Works */}
+        <div className="glass-panel stat-card" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: '16px',
+          padding: '28px 24px',
+          border: '1px solid rgba(99, 102, 241, 0.4)'
+        }}>
+          <img 
+            src="https://ik.imagekit.io/rishii/Total_Assigned_Works.webp" 
+            alt="Total Assigned Works" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '120px', 
+              height: 'auto', 
+              aspectRatio: '1 / 1', 
+              borderRadius: '16px', 
+              objectFit: 'contain', 
+              boxShadow: '0 6px 18px rgba(99, 102, 241, 0.25)' 
+            }} 
+          />
+          <div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Total Assigned Works</span>
+            <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 850, marginTop: '8px' }}>{totalTasksCount}</div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: 0 }}>Overall imported from excel</p>
           </div>
-          <div className="stat-value">{totalTasksCount}</div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Overall imported from excel</p>
         </div>
 
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--color-danger)' }}>
-          <div className="stat-header">
-            <span>Pending Follow-ups</span>
-            <AlertCircle size={20} style={{ color: 'var(--color-danger)' }} />
+        {/* Card 2: Pending Follow-ups */}
+        <div className="glass-panel stat-card" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: '16px',
+          padding: '28px 24px',
+          border: '1px solid rgba(239, 68, 68, 0.4)'
+        }}>
+          <img 
+            src="https://ik.imagekit.io/rishii/Pending_Follow_ups.webp" 
+            alt="Pending Follow-ups" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '120px', 
+              height: 'auto', 
+              aspectRatio: '1 / 1', 
+              borderRadius: '16px', 
+              objectFit: 'contain', 
+              boxShadow: '0 6px 18px rgba(239, 68, 68, 0.25)' 
+            }} 
+          />
+          <div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Pending Follow-ups</span>
+            <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 850, color: 'var(--color-danger)', marginTop: '8px' }}>{pendingTasksCount}</div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: 0 }}>Awaiting action / followup</p>
           </div>
-          <div className="stat-value" style={{ color: 'var(--color-danger)' }}>{pendingTasksCount}</div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Awaiting action / followup</p>
         </div>
 
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--color-success)' }}>
-          <div className="stat-header">
-            <span>Completed Tasks</span>
-            <CheckCircle size={20} style={{ color: 'var(--color-success)' }} />
+        {/* Card 3: Completed Tasks */}
+        <div className="glass-panel stat-card" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: '16px',
+          padding: '28px 24px',
+          border: '1px solid rgba(16, 185, 129, 0.4)'
+        }}>
+          <img 
+            src="https://ik.imagekit.io/rishii/Completed_Tasks.webp" 
+            alt="Completed Tasks" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '120px', 
+              height: 'auto', 
+              aspectRatio: '1 / 1', 
+              borderRadius: '16px', 
+              objectFit: 'contain', 
+              boxShadow: '0 6px 18px rgba(16, 185, 129, 0.25)' 
+            }} 
+          />
+          <div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Completed Tasks</span>
+            <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 850, color: 'var(--color-success)', marginTop: '8px' }}>{completedTasksCount}</div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: 0 }}>Finished or closed jobs</p>
           </div>
-          <div className="stat-value" style={{ color: 'var(--color-success)' }}>{completedTasksCount}</div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Finished or closed jobs</p>
         </div>
 
-        <div className="glass-panel stat-card" style={{ borderLeft: '4px solid var(--color-warning)' }}>
-          <div className="stat-header">
-            <span>Reminders for Sir</span>
-            <Bell size={20} style={{ color: 'var(--color-warning)' }} />
+        {/* Card 4: Reminders for Sir */}
+        <div className="glass-panel stat-card" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: '16px',
+          padding: '28px 24px',
+          border: '1px solid rgba(245, 158, 11, 0.4)'
+        }}>
+          <img 
+            src="https://ik.imagekit.io/rishii/Reminders_for_Sir.webp" 
+            alt="Reminders for Sir" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '120px', 
+              height: 'auto', 
+              aspectRatio: '1 / 1', 
+              borderRadius: '16px', 
+              objectFit: 'contain', 
+              boxShadow: '0 6px 18px rgba(245, 158, 11, 0.25)' 
+            }} 
+          />
+          <div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Reminders for Sir</span>
+            <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 850, color: 'var(--color-warning)', marginTop: '8px' }}>{sirRemindersCount}</div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: 0 }}>Urgent pending reminders</p>
           </div>
-          <div className="stat-value" style={{ color: 'var(--color-warning)' }}>{sirRemindersCount}</div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Urgent pending reminders</p>
         </div>
       </div>
 
