@@ -143,7 +143,7 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
           <div className="notice-meta">
             <span className={`badge ${isUrgent ? 'badge-danger' : 'badge-info'}`} style={{ fontWeight: 700 }}>
               {isUrgent && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#fff', marginRight: '6px', animation: 'blinkDot 1s infinite' }} />}
-              Target Date: {new Date(rem.targetDate).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+              Target Date: {new Date(rem.targetDate).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short', hour12: true }).toUpperCase()}
             </span>
             {!isSelf && (
               <span className={`badge ${rem.status === 'acknowledged' ? 'badge-success' : 'badge-warning'}`}>
@@ -262,7 +262,7 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
                 <CheckCircle size={16} /> Acknowledged
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                by {rem.acknowledgedBy?.name || 'You'} at {new Date(rem.acknowledgedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                by {rem.acknowledgedBy?.name || 'You'} at {new Date(rem.acknowledgedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()}
               </span>
             </div>
           )}

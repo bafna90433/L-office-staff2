@@ -87,7 +87,7 @@ export default function Dashboard({
               <p className="notice-text">{rem.message}</p>
               <p className="notice-date" style={{ fontSize: '0.8rem', color: isUrgent ? 'var(--color-danger)' : 'var(--text-secondary)', fontWeight: isUrgent ? 600 : 'normal' }}>
                 {isUrgent && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-danger)', marginRight: '6px', animation: 'blinkDot 1s infinite' }} />}
-                Target Date: {new Date(rem.targetDate).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+                Target Date: {new Date(rem.targetDate).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short', hour12: true }).toUpperCase()}
               </p>
             </div>
             <button onClick={() => onAcknowledgeReminder(rem._id)} className="btn btn-success" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
