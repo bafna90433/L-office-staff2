@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Calendar, AlertCircle } from 'lucide-react';
+import { Search, Calendar, AlertCircle, Plus } from 'lucide-react';
 import '../styles/WorksBoard.css';
 
 interface Task {
@@ -22,9 +22,10 @@ interface Task {
 interface WorksBoardProps {
   tasks: Task[];
   onOpenTaskDetails: (task: Task) => void;
+  onOpenCreateTask: () => void;
 }
 
-export default function WorksBoard({ tasks, onOpenTaskDetails }: WorksBoardProps) {
+export default function WorksBoard({ tasks, onOpenTaskDetails, onOpenCreateTask }: WorksBoardProps) {
   // Local filter states
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('pending');
   const [typeFilter, setTypeFilter] = useState<'all' | 'regular' | 'reminder-sir' | 'custom'>('all');
@@ -75,9 +76,14 @@ export default function WorksBoard({ tasks, onOpenTaskDetails }: WorksBoardProps
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      <div className="works-header">
-        <h1 className="works-title">Works & Follow-ups Board</h1>
-        <p className="works-subtitle">Review imported checklists, update remarks, follow-up dates, and track finished jobs.</p>
+      <div className="works-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 className="works-title" style={{ margin: 0 }}>Works & Follow-ups Board</h1>
+          <p className="works-subtitle" style={{ margin: '4px 0 0 0' }}>Review imported checklists, update remarks, follow-up dates, and track finished jobs.</p>
+        </div>
+        <button className="btn btn-primary" onClick={onOpenCreateTask} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '8px' }}>
+          <Plus size={18} /> New Work / Follow-up
+        </button>
       </div>
 
       {/* Filter controls */}

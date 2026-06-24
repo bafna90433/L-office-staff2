@@ -8,9 +8,12 @@ import WorksBoard from './page/WorksBoard';
 import Notices from './page/Notices';
 import Chat from './page/Chat';
 import TaskDetailModal from './page/TaskDetailModal';
+import CreateTaskModal from './page/CreateTaskModal';
 import Profile from './page/Profile';
 
-const API_BASE = 'https://l-backend-production-ff32.up.railway.app/api';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : 'https://l-backend-production-ff32.up.railway.app/api';
 
 interface User {
   id: string;
@@ -63,6 +66,9 @@ export default function App() {
 
   // Selected Task for Details Modal
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  // Create Task Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Toast Notification State
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'danger' | 'warning' | 'info' } | null>(null);
@@ -227,6 +233,7 @@ export default function App() {
           <WorksBoard 
             tasks={tasks}
             onOpenTaskDetails={setSelectedTask}
+            onOpenCreateTask={() => setIsCreateModalOpen(true)}
           />
         );
       case 'reminders':
@@ -380,6 +387,21 @@ export default function App() {
           apiBase={API_BASE}
           onClose={() => setSelectedTask(null)}
           onTaskUpdated={fetchTasks}
+          showToast={showToast}
+        />
+      )}
+
+      {/* Create Task Modal Overlay */}
+      {isCreateModalOpen && (
+        <CreateTaskModal 
+          token={token}
+          user={user}
+          apiBase={API_BASE}
+          onClose={() => setIsCreateModalOpen(false)}
+          onTaskCreated={() => {
+            fetchTasks();
+            setIsCreateModalOpen(false);
+          }}
           showToast={showToast}
         />
       )}
