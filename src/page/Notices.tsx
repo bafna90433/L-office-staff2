@@ -1,4 +1,4 @@
-import { CheckCircle, Trash2, Plus } from 'lucide-react';
+import { CheckCircle, Trash2, Plus, Pencil, X, Save } from 'lucide-react';
 import { useState } from 'react';
 import '../styles/Notices.css';
 
@@ -16,6 +16,10 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
   const [newTargetDate, setNewTargetDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [noticeDateSelections, setNoticeDateSelections] = useState<Record<string, string>>({});
+  const [editingNoticeId, setEditingNoticeId] = useState<string | null>(null);
+  const [editingDateValue, setEditingDateValue] = useState<string>('');
+  const [editingMessageValue, setEditingMessageValue] = useState<string>('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const ownerNotices = reminders.filter(r => r.type !== 'self');
   const selfReminders = reminders.filter(r => r.type === 'self');
@@ -64,6 +68,58 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
     }
   };
 
+  const handleStartEditPersonal = (rem: any) => {
+    setEditingNoticeId(rem._id);
+    setEditingDateValue(formatForDateTimeInput(rem.targetDate));
+    setEditingMessageValue(rem.message);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingNoticeId(null);
+    setEditingDateValue('');
+    setEditingMessageValue('');
+  };
+
+  const handleSavePersonalReminder = async (remId: string) => {
+    if (!editingMessageValue.trim()) {
+      showToast('Reminder message cannot be empty', 'danger');
+      return;
+    }
+    if (!editingDateValue) {
+      showToast('Please select a valid date and time', 'danger');
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      const localDate = new Date(editingDateValue);
+      const isoDate = localDate.toISOString();
+
+      const res = await fetch(`${apiBase}/reminders/self/${remId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ message: editingMessageValue, targetDate: isoDate })
+      });
+
+      if (res.ok) {
+        setEditingNoticeId(null);
+        setEditingDateValue('');
+        setEditingMessageValue('');
+        onRefresh();
+        showToast('Personal reminder updated!', 'success');
+      } else {
+        const errData = await res.json();
+        showToast(errData.message || 'Failed to update personal reminder', 'danger');
+      }
+    } catch (err) {
+      showToast('Error connecting to server', 'danger');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   const formatForDateTimeInput = (value?: string) => {
     if (!value) return '';
     const date = new Date(value);
@@ -76,6 +132,7 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
     const timeDiff = new Date(rem.targetDate).getTime() - Date.now();
     const isUrgent = rem.status === 'pending' && timeDiff <= 10 * 60 * 1000 && timeDiff > -1000 * 60 * 60 * 24;
     const noticeDateValue = noticeDateSelections[rem._id] ?? formatForDateTimeInput(rem.targetDate);
+    const isEditingThis = editingNoticeId === rem._id;
 
     return (
       <div key={rem._id} className={`animate-fade-in notice-card ${isUrgent ? 'urgent-pulse' : ''}`} style={isUrgent ? { border: '2px solid var(--color-danger)' } : {}}>
@@ -95,7 +152,21 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
             )}
           </div>
           
-          <p className="notice-card-text">{rem.message}</p>
+          {isSelf && isEditingThis ? (
+            <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label className="form-label" style={{ fontSize: '0.72rem', marginBottom: '2px', textAlign: 'left' }}>Edit Message</label>
+              <input
+                type="text"
+                className="form-input"
+                value={editingMessageValue}
+                onChange={e => setEditingMessageValue(e.target.value)}
+                style={{ width: '100%', padding: '8px' }}
+                placeholder="Remind me to..."
+              />
+            </div>
+          ) : (
+            <p className="notice-card-text">{rem.message}</p>
+          )}
 
           {!isSelf && (
             <div className="notice-card-footer">
@@ -104,16 +175,60 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px', minWidth: isSelf ? 'auto' : '220px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px', minWidth: (isSelf && !isEditingThis) ? 'auto' : '220px' }}>
           {isSelf ? (
-            <button 
-              onClick={() => handleDeleteSelfReminder(rem._id)}
-              className="btn btn-secondary notice-action-btn"
-              style={{ padding: '8px', background: 'transparent', border: '1px solid var(--color-danger)', color: 'var(--color-danger)' }}
-              title="Delete Reminder"
-            >
-              <Trash2 size={16} />
-            </button>
+            isEditingThis ? (
+              <>
+                <div style={{ width: '100%' }}>
+                  <label className="form-label" style={{ fontSize: '0.72rem', marginBottom: '6px', textAlign: 'left' }}>
+                    ✏️ Edit Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="form-input"
+                    value={editingDateValue}
+                    onChange={e => setEditingDateValue(e.target.value)}
+                    style={{ width: '100%', minWidth: '200px' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => handleSavePersonalReminder(rem._id)}
+                    disabled={savingEdit || !editingDateValue || !editingMessageValue.trim()}
+                    className="btn btn-success notice-action-btn"
+                    style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  >
+                    <Save size={14} /> {savingEdit ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="btn btn-secondary notice-action-btn"
+                    style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', background: 'transparent', border: '1px solid var(--border-color)' }}
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => handleStartEditPersonal(rem)}
+                  className="btn btn-secondary notice-action-btn"
+                  style={{ padding: '8px', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)' }}
+                  title="Edit Reminder"
+                >
+                  <Pencil size={16} />
+                </button>
+                <button 
+                  onClick={() => handleDeleteSelfReminder(rem._id)}
+                  className="btn btn-secondary notice-action-btn"
+                  style={{ padding: '8px', background: 'transparent', border: '1px solid var(--color-danger)', color: 'var(--color-danger)' }}
+                  title="Delete Reminder"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            )
           ) : rem.status === 'pending' ? (
             <>
               <div style={{ width: '100%' }}>
