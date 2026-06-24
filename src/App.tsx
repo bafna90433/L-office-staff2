@@ -98,10 +98,17 @@ export default function App() {
     }
   }, [user]);
 
-  // Fetch tasks on activeTab change
+  // Fetch tasks and reminders on activeTab change
   useEffect(() => {
-    if (user && user.role === 'staff2' && activeTab === 'tasks') {
-      fetchTasks();
+    if (user && user.role === 'staff2') {
+      if (activeTab === 'tasks') {
+        fetchTasks();
+      } else if (activeTab === 'reminders') {
+        fetchReminders();
+      } else if (activeTab === 'dashboard') {
+        fetchTasks();
+        fetchReminders();
+      }
     }
   }, [activeTab, user]);
 
