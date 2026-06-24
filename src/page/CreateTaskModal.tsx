@@ -19,7 +19,7 @@ export default function CreateTaskModal({
   showToast
 }: CreateTaskModalProps) {
   const [title, setTitle] = useState('');
-  const [taskType, setTaskType] = useState<'regular' | 'reminder-sir' | 'custom'>('custom');
+  const [taskType, setTaskType] = useState<'regular' | 'reminder-sir' | 'custom'>('regular');
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly' | 'one-time'>('one-time');
   const [description, setDescription] = useState('');
   const [remarks, setRemarks] = useState('');
@@ -110,7 +110,6 @@ export default function CreateTaskModal({
                 onChange={e => setTaskType(e.target.value as any)}
                 style={{ padding: '10px 12px' }}
               >
-                <option value="custom">LULU & SPP Followup</option>
                 <option value="regular">Daily Work (Sheet1)</option>
                 <option value="reminder-sir">Sir Reminder</option>
               </select>

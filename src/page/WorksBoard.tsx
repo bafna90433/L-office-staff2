@@ -113,7 +113,6 @@ export default function WorksBoard({ tasks, onOpenTaskDetails, onOpenCreateTask 
             <option value="all">All Sheets</option>
             <option value="regular">Daily Works (Sheet1)</option>
             <option value="reminder-sir">Sir Reminders</option>
-            <option value="custom">LULU & SPP Followups</option>
           </select>
         </div>
 
