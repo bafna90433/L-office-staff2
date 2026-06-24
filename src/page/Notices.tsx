@@ -11,6 +11,48 @@ interface NoticesProps {
   onRefresh: () => void;
 }
 
+const CustomDateTimePicker = ({ value, onChange, className, style }: any) => {
+  const datePart = value ? value.split('T')[0] : '';
+  const timePart = value && value.includes('T') ? value.split('T')[1].substring(0, 5) : '12:00';
+  let h = parseInt(timePart.split(':')[0] || '12');
+  const m = timePart.split(':')[1] || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if (h === 0) h = 12;
+
+  const handleDateChange = (e: any) => {
+    const newDate = e.target.value;
+    if (!newDate) { onChange(''); return; }
+    const curH = parseInt(timePart.split(':')[0] || '12');
+    onChange(`${newDate}T${curH.toString().padStart(2, '0')}:${m}`);
+  };
+
+  const handleTimeChange = (newH12: number, newM: string, newAmPm: string) => {
+    if (!datePart) return;
+    let h24 = newH12;
+    if (newAmPm === 'PM' && h24 < 12) h24 += 12;
+    if (newAmPm === 'AM' && h24 === 12) h24 = 0;
+    onChange(`${datePart}T${h24.toString().padStart(2, '0')}:${newM}`);
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: '6px', width: '100%', alignItems: 'center' }}>
+      <input type="date" className={className} value={datePart} onChange={handleDateChange} style={{ flex: 1, padding: '8px', ...style }} />
+      <select className={className} value={h} onChange={e => handleTimeChange(parseInt(e.target.value), m, ampm)} style={{ padding: '8px', minWidth: '50px' }}>
+        {[1,2,3,4,5,6,7,8,9,10,11,12].map(num => <option key={num} value={num}>{num.toString().padStart(2, '0')}</option>)}
+      </select>
+      <span>:</span>
+      <select className={className} value={m} onChange={e => handleTimeChange(h, e.target.value, ampm)} style={{ padding: '8px', minWidth: '50px' }}>
+        {Array.from({length: 60}, (_, i) => i.toString().padStart(2, '0')).map(num => <option key={num} value={num}>{num}</option>)}
+      </select>
+      <select className={className} value={ampm} onChange={e => handleTimeChange(h, m, e.target.value)} style={{ padding: '8px', minWidth: '60px' }}>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
+    </div>
+  );
+};
+
 export default function Notices({ reminders, onAcknowledgeReminder, apiBase, token, showToast, onRefresh }: NoticesProps) {
   const [newMessage, setNewMessage] = useState('');
   const [newTargetDate, setNewTargetDate] = useState('');
@@ -186,12 +228,11 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
                   <label className="form-label" style={{ fontSize: '0.72rem', marginBottom: '6px', textAlign: 'left' }}>
                     ✏️ Edit Date & Time
                   </label>
-                  <input
-                    type="datetime-local"
+                  <CustomDateTimePicker
                     className="form-input"
                     value={editingDateValue}
-                    onChange={e => setEditingDateValue(e.target.value)}
-                    style={{ width: '100%', minWidth: '200px' }}
+                    onChange={(v: string) => setEditingDateValue(v)}
+                    style={{ width: '100%' }}
                   />
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -236,12 +277,11 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
             <>
               <div style={{ width: '100%' }}>
                 <label className="form-label" style={{ fontSize: '0.72rem', marginBottom: '6px', textAlign: 'left' }}>Date & Time</label>
-                <input
-                  type="datetime-local"
+                <CustomDateTimePicker
                   className="form-input"
                   value={noticeDateValue}
-                  onChange={e => setNoticeDateSelections(prev => ({ ...prev, [rem._id]: e.target.value }))}
-                  style={{ width: '100%', minWidth: '200px' }}
+                  onChange={(v: string) => setNoticeDateSelections(prev => ({ ...prev, [rem._id]: v }))}
+                  style={{ width: '100%' }}
                 />
               </div>
               <button 
@@ -300,9 +340,13 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
             <label className="form-label">Reminder Message</label>
             <input type="text" className="form-input" value={newMessage} onChange={e => setNewMessage(e.target.value)} required placeholder="Remind me to..." />
           </div>
-          <div style={{ width: '220px' }}>
+          <div style={{ flex: '1 1 350px' }}>
             <label className="form-label">Target Date & Time</label>
-            <input type="datetime-local" className="form-input" value={newTargetDate} onChange={e => setNewTargetDate(e.target.value)} required />
+            <CustomDateTimePicker
+              className="form-input"
+              value={newTargetDate}
+              onChange={(v: string) => setNewTargetDate(v)}
+            />
           </div>
           <button type="submit" className="btn btn-primary" disabled={submitting} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
             <Plus size={18} /> {submitting ? 'Adding...' : 'Add'}
