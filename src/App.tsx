@@ -203,11 +203,18 @@ export default function App() {
     }
   };
 
-  const handleAcknowledgeReminder = async (id: string) => {
+  const handleAcknowledgeReminder = async (id: string, targetDate?: string) => {
     try {
+      const payload: any = {};
+      if (targetDate) payload.targetDate = targetDate;
+
       const res = await fetch(`${API_BASE}/reminders/${id}/acknowledge`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         fetchReminders();

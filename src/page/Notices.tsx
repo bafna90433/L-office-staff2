@@ -4,7 +4,7 @@ import '../styles/Notices.css';
 
 interface NoticesProps {
   reminders: any[];
-  onAcknowledgeReminder: (id: string) => void;
+  onAcknowledgeReminder: (id: string, targetDate?: string) => void;
   apiBase: string;
   token: string;
   showToast: (msg: string, type: 'success' | 'danger' | 'info') => void;
@@ -242,7 +242,11 @@ export default function Notices({ reminders, onAcknowledgeReminder, apiBase, tok
                 />
               </div>
               <button 
-                onClick={() => onAcknowledgeReminder(rem._id)} 
+                onClick={() => {
+                  const val = noticeDateSelections[rem._id] || formatForDateTimeInput(rem.targetDate);
+                  const localDate = new Date(val);
+                  onAcknowledgeReminder(rem._id, localDate.toISOString());
+                }} 
                 className="btn btn-success notice-action-btn" 
                 style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
               >
